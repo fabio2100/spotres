@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import axios from "axios";
 
 export default function HomePage() {
-  const router = useRouter();
   const [hasCode, setHasCode] = useState(false);
   const [token, setToken] = useState(null);
   const [tracks, setTracks] = useState([]);
@@ -22,23 +20,12 @@ export default function HomePage() {
 
   const fetchToken = async (code) => {
     try {
-      const response = await axios.post(
-        "https://accounts.spotify.com/api/token",
-        null,
-        {
-          params: {
-            grant_type: "authorization_code",
-            code: code,
-            redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI,
-            client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
-            client_secret: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET,
-          },
-        }
-      );
-      setToken(response.data.access_token);
-      fetchTopTracks(response.data.access_token);
+      const response = await axios.get(`/api/getToken?code=${code}`);
+      const accessToken = response.data.access_token;
+      setToken(accessToken);
+      fetchTopTracks(accessToken);
     } catch (error) {
-      console.log("Error fetching token", error);
+      console.error("Error fetching the token", error);
     }
   };
 
@@ -59,7 +46,7 @@ export default function HomePage() {
   };
 
   return (
-    <div>
+    <div className={styles.pages}>
       {" "}
       <h1>Spotres</h1>{" "}
       {hasCode ? (
