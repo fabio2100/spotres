@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import axios from "axios";
+import Head from "next/head";
 
 export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
@@ -45,9 +46,12 @@ export default function HomePage() {
     window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read`;
   };
 
-  return (
-    <div className={styles.pages}>
-      {" "}
+  return (<>
+    <Head>
+        <title>Spotres</title>
+      </Head>
+    <div className={styles.page}>
+      
       <h1>Spotres</h1>{" "}
       {hasCode ? (
         tracks.length > 0 ? (
@@ -68,5 +72,6 @@ export default function HomePage() {
         <button onClick={handleLogin}>Login</button>
       )}{" "}
     </div>
+    </>
   );
 }
