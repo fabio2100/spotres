@@ -29,9 +29,9 @@ export default function HomePage() {
           params: {
             grant_type: "authorization_code",
             code: code,
-            redirect_uri: "http://localhost:3000",
-            client_id: "72a784c03ba44304b249998a5ac3e899",
-            client_secret: "92b7aeeb47d0474ba73d5a186451358b",
+            redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI,
+            client_id: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET,
           },
         }
       );
@@ -55,14 +55,13 @@ export default function HomePage() {
   };
 
   const handleLogin = () => {
-    window.location.href =
-      "https://accounts.spotify.com/authorize?client_id=72a784c03ba44304b249998a5ac3e899&response_type=code&redirect_uri=http://localhost:3000&scope=user-top-read";
+    window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read`;
   };
 
   return (
     <div>
       {" "}
-      <h1>Bienvenido a mi aplicación Next.js</h1>{" "}
+      <h1>Spotres</h1>{" "}
       {hasCode ? (
         tracks.length > 0 ? (
           <ul>
