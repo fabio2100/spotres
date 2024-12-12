@@ -46,32 +46,32 @@ export default function HomePage() {
     window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read`;
   };
 
-  return (<>
-    <Head>
+  return (
+    <>
+      <Head>
         <title>Spotres</title>
       </Head>
-    <div className={styles.page}>
-      
-      <h1>Spotres</h1>{" "}
-      {hasCode ? (
-        tracks.length > 0 ? (
-          <ul>
-            {" "}
-            {tracks.map((track) => (
-              <li key={track.id}>
-                {" "}
-                {track.name} by{" "}
-                {track.artists.map((artist) => artist.name).join(", ")}{" "}
-              </li>
-            ))}{" "}
-          </ul>
+      <div className={styles.page}>
+        <h1>Spotres</h1>{" "}
+        {hasCode ? (
+          tracks.length > 0 ? (
+            <ul>
+              {" "}
+              {tracks.map((track) => (
+                <li key={track.id}>
+                  {" "}
+                  {track.name} by{" "}
+                  {track.artists.map((artist) => artist.name).join(", ")}{" "}
+                </li>
+              ))}{" "}
+            </ul>
+          ) : (
+            <p>Validando código y obteniendo canciones...</p>
+          )
         ) : (
-          <p>Validando código y obteniendo canciones...</p>
-        )
-      ) : (
-        <button onClick={handleLogin}>Login</button>
-      )}{" "}
-    </div>
+          <button onClick={handleLogin}>Login</button>
+        )}{" "}
+      </div>
     </>
   );
 }
