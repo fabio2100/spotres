@@ -9,6 +9,7 @@ export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
   const [token, setToken] = useState(null);
   const [tracks, setTracks] = useState([]);
+  const [artists, setArtists] = useState([]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -24,19 +25,24 @@ export default function HomePage() {
       const response = await axios.get(`/api/getToken?code=${code}`);
       const accessToken = response.data.access_token;
       setToken(accessToken);
-      fetchTopTracks(accessToken);
+      fetchUserData(accessToken);
     } catch (error) {
       console.error("Error fetching the token", error);
     }
   };
 
-  const fetchTopTracks = async (accessToken) => {
+  const fetchUserData = async (accessToken) => {
     try {
-      const response = await axios.get(
-        "https://api.spotify.com/v1/me/top/tracks",
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      setTracks(response.data.items);
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+      };
+      const [responseTracks, responseArtists] = await Promise.all([
+        axios.get("https://api.spotify.com/v1/me/top/tracks", { headers }),
+        axios.get("https://api.spotify.com/v1/me/top/artists", { headers }),
+      ]);
+
+      setTracks(responseTracks.data.items);
+      setArtists(responseArtists.data.items);
     } catch (error) {
       console.error("Error fetching the top tracks", error);
     }
@@ -55,7 +61,7 @@ export default function HomePage() {
         <h1>Spotres</h1>{" "}
         {hasCode ? (
           tracks.length > 0 ? (
-            <ul>
+            <ol>
               {" "}
               {tracks.map((track) => (
                 <li key={track.id}>
@@ -64,13 +70,14 @@ export default function HomePage() {
                   {track.artists.map((artist) => artist.name).join(", ")}{" "}
                 </li>
               ))}{" "}
-            </ul>
+            </ol>
           ) : (
             <p>Validando código y obteniendo canciones...</p>
           )
         ) : (
           <button onClick={handleLogin}>Login</button>
         )}{" "}
+        
       </div>
     </>
   );
