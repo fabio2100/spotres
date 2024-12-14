@@ -9,7 +9,11 @@ export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
   const [token, setToken] = useState(null);
   const [tracks, setTracks] = useState([]);
+  const [tracksLongTerm, setTracksLongTerm] = useState([]);
+  const [tracksShortTerm, setTracksShortTerm] = useState([]);
   const [artists, setArtists] = useState([]);
+  const [artistsLongTerm, setArtistsLongTerm] = useState([]);
+  const [artistsShortTerm, setArtistsShortTerm] = useState([]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -40,14 +44,40 @@ export default function HomePage() {
       const headers = {
         Authorization: `Bearer ${accessToken}`,
       };
-      const [responseTracks, responseArtists] = await Promise.all([
-        axios.get("https://api.spotify.com/v1/me/top/tracks", { headers }),
-        axios.get("https://api.spotify.com/v1/me/top/artists", { headers }),
+      const [
+        responseTracks,
+        responseTracksLongTerm,
+        responseTracksShortTerm,
+        responseArtists,
+        responseArtistsLongTerm,
+        responseArtistsShortTerm
+      ] = await Promise.all([
+        axios.get("https://api.spotify.com/v1/me/top/tracks?limit=50", { headers }),
+        axios.get(
+          "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50",
+          { headers }
+        ),
+        axios.get(
+          "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50",
+          { headers }
+        ),
+        axios.get("https://api.spotify.com/v1/me/top/artists?limit=50", { headers }),
+        axios.get(
+          "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50",
+          { headers }
+        ),
+        axios.get(
+          "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50",
+          { headers }
+        ),
       ]);
 
       setTracks(responseTracks.data.items);
+      setTracksLongTerm(responseTracksLongTerm.data.items);
+      setTracksShortTerm(responseTracksShortTerm.data.items);
       setArtists(responseArtists.data.items);
-      console.log(responseTracks.data.items);
+      setArtistsLongTerm(responseArtistsLongTerm.data.items);
+      setArtistsShortTerm(responseArtistsShortTerm.data.items)
     } catch (error) {
       console.error("Error fetching the top tracks", error);
     }
@@ -67,6 +97,20 @@ export default function HomePage() {
         {hasCode ? (
           tracks.length > 0 ? (
             <div>
+              <div className="title-section">Canciones - Últimas 4 semanas</div>
+              <ol>
+                {" "}
+                {tracksShortTerm.map((track) => (
+                  <li key={track.id}>
+                    <span>{track.name}</span>
+                    <span>
+                      {track.artists.map((artist) => artist.name).join(", ")}
+                    </span>
+                    <span>{"Popularity: " + track.popularity}</span>
+                  </li>
+                ))}{" "}
+              </ol>
+              <div className="title-section">Canciones - Últimos 6 meses</div>
               <ol>
                 {" "}
                 {tracks.map((track) => (
@@ -75,13 +119,50 @@ export default function HomePage() {
                     <span>
                       {track.artists.map((artist) => artist.name).join(", ")}
                     </span>
-                    <span>{'Popularity: '+track.popularity}</span>
+                    <span>{"Popularity: " + track.popularity}</span>
                   </li>
                 ))}{" "}
               </ol>
+
+              <div className="title-section">Canciones - Último año</div>
+              <ol>
+                {" "}
+                {tracksLongTerm.map((track) => (
+                  <li key={track.id}>
+                    <span>{track.name}</span>
+                    <span>
+                      {track.artists.map((artist) => artist.name).join(", ")}
+                    </span>
+                    <span>{"Popularity: " + track.popularity}</span>
+                  </li>
+                ))}{" "}
+              </ol>
+              <div className="title-section">Artistas - Últimas 4 semanas</div>
+              <ol>
+                {" "}
+                {artistsShortTerm.map((artist) => (
+                  <li key={artist.id}>
+                    {" "}
+                    <span>{artist.name}</span>{" "}
+                    <span>{"Popularity: " + artist.popularity}</span>{" "}
+                  </li>
+                ))}{" "}
+              </ol>
+              <div className="title-section">Artistas - Últimos 6 meses</div>
               <ol>
                 {" "}
                 {artists.map((artist) => (
+                  <li key={artist.id}>
+                    {" "}
+                    <span>{artist.name}</span>{" "}
+                    <span>{"Popularity: " + artist.popularity}</span>{" "}
+                  </li>
+                ))}{" "}
+              </ol>
+              <div className="title-section">Artistas - Último año</div>
+              <ol>
+                {" "}
+                {artistsLongTerm.map((artist) => (
                   <li key={artist.id}>
                     {" "}
                     <span>{artist.name}</span>{" "}

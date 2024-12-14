@@ -81,6 +81,7 @@ li span {
 
 li span:first-child {
 	font-size: 1.5em;
+  color: silver;
 }
 
 li span:last-child {
@@ -89,4 +90,8 @@ li span:last-child {
 
 li span:nth-child(2){
   font-style: italic;
+}
+
+.title-section{
+  color: silver;
 }
