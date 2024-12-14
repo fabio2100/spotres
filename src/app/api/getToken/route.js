@@ -26,6 +26,6 @@ export async function GET(req) {
     return NextResponse.json(response.data);
   } catch (error) {
     console.log(error)
-    return NextResponse.json({ error: 'Failed to fetch token' }, { status: 503 });
+    return NextResponse.json({ error: 'Failed to fetch token' }, { status: 403 });
   }
 }

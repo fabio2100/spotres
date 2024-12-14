@@ -27,7 +27,11 @@ export default function HomePage() {
       setToken(accessToken);
       fetchUserData(accessToken);
     } catch (error) {
-      console.error("Error fetching the token", error);
+      if (error.response && error.response.status === 403) {
+        window.location.href = process.env.NEXT_PUBLIC_REDIRECT_URI;
+      } else {
+        console.error("Error fetching the token", error);
+      }
     }
   };
 
@@ -43,6 +47,7 @@ export default function HomePage() {
 
       setTracks(responseTracks.data.items);
       setArtists(responseArtists.data.items);
+      console.log(responseTracks.data.items);
     } catch (error) {
       console.error("Error fetching the top tracks", error);
     }
@@ -58,25 +63,39 @@ export default function HomePage() {
         <title>Spotres</title>
       </Head>
       <div className={styles.page}>
-        <h1>Spotres</h1>{" "}
+        <h1>Spotres</h1> {}
         {hasCode ? (
           tracks.length > 0 ? (
-            <ol>
-              {" "}
-              {tracks.map((track) => (
-                <li key={track.id}>
-                  <span>{track.name}</span>
-                  <span>{track.artists.map((artist) => artist.name).join(", ")}</span>
-                </li>
-              ))}{" "}
-            </ol>
+            <div>
+              <ol>
+                {" "}
+                {tracks.map((track) => (
+                  <li key={track.id}>
+                    <span>{track.name}</span>
+                    <span>
+                      {track.artists.map((artist) => artist.name).join(", ")}
+                    </span>
+                    <span>{'Popularity: '+track.popularity}</span>
+                  </li>
+                ))}{" "}
+              </ol>
+              <ol>
+                {" "}
+                {artists.map((artist) => (
+                  <li key={artist.id}>
+                    {" "}
+                    <span>{artist.name}</span>{" "}
+                    <span>{"Popularity: " + artist.popularity}</span>{" "}
+                  </li>
+                ))}{" "}
+              </ol>
+            </div>
           ) : (
             <p>Validando código y obteniendo canciones...</p>
           )
         ) : (
           <button onClick={handleLogin}>Login</button>
         )}{" "}
-        
       </div>
     </>
   );
