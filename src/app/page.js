@@ -65,9 +65,8 @@ export default function HomePage() {
               {" "}
               {tracks.map((track) => (
                 <li key={track.id}>
-                  {" "}
-                  {track.name} by{" "}
-                  {track.artists.map((artist) => artist.name).join(", ")}{" "}
+                  <span>{track.name}</span>
+                  <span>{track.artists.map((artist) => artist.name).join(", ")}</span>
                 </li>
               ))}{" "}
             </ol>
