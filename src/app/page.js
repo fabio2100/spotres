@@ -7,21 +7,21 @@ import Head from "next/head";
 
 export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
-  const [userData,setUserData] = useState({
-    tracksMedium : [],
-    tracksShort : [],
-    tracksLong : [],
-    artistsMedium : [],
-    artistsShort : [],
-    artistsLong : [],
+  const [userData, setUserData] = useState({
+    tracksMedium: [],
+    tracksShort: [],
+    tracksLong: [],
+    artistsMedium: [],
+    artistsShort: [],
+    artistsLong: [],
   });
 
-  const updateUserData = (key,value) => {
-    setUserData((prevState)=>({
+  const updateUserData = (key, value) => {
+    setUserData((prevState) => ({
       ...prevState,
-      [key]: value
-    }))
-  }
+      [key]: value,
+    }));
+  };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -51,42 +51,78 @@ export default function HomePage() {
       const headers = {
         Authorization: `Bearer ${accessToken}`,
       };
-      const [
-        responseTracks,
-        responseTracksLongTerm,
-        responseTracksShortTerm,
-        responseArtists,
-        responseArtistsLongTerm,
-        responseArtistsShortTerm
-      ] = await Promise.all([
-        axios.get("https://api.spotify.com/v1/me/top/tracks?limit=50", { headers }),
-        axios.get(
-          "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50",
-          { headers }
-        ),
-        axios.get(
-          "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50",
-          { headers }
-        ),
-        axios.get("https://api.spotify.com/v1/me/top/artists?limit=50", { headers }),
-        axios.get(
-          "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50",
-          { headers }
-        ),
-        axios.get(
-          "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50",
-          { headers }
-        ),
-      ]);
+      const promises = [
+        {
+          id: "tracksMedium",
+          promise: axios.get(
+            "https://api.spotify.com/v1/me/top/tracks?limit=50",
+            {
+              headers,
+            }
+          ),
+        },
+        {
+          id: "tracksShort",
+          promise: axios.get(
+            "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50",
+            { headers }
+          ),
+        },
+        {
+          id: "tracksLong",
+          promise: axios.get(
+            "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50",
+            { headers }
+          ),
+        },
+        {
+          id: "artistsMedium",
+          promise: axios.get(
+            "https://api.spotify.com/v1/me/top/artists?limit=50",
+            {
+              headers,
+            }
+          ),
+        },
+        {
+          id: "artistsLong",
+          promise: axios.get(
+            "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50",
+            { headers }
+          ),
+        },
+        {
+          id: "artistsShort",
+          promise: axios.get(
+            "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50",
+            { headers }
+          ),
+        },
+      ];
 
-      setUserData({
-        tracksMedium : responseTracks.data.items,
-        tracksShort : responseTracksShortTerm.data.items,
-        tracksLong : responseTracksLongTerm.data.items,
-        artistsMedium : responseArtists.data.items,
-        artistsShort : responseArtistsShortTerm.data.items,
-        artistsLong : responseArtistsLongTerm.data.items,
-      })
+      const promisesArray = promises.map(p => p.promise)
+
+      Promise.allSettled(promisesArray).then((results) => {
+        results.forEach((result,index) => {
+          const promiseId = promises[index].id
+          
+          if (result.status === "fulfilled") {
+            console.log(`Promesa ${promiseId} cumplida:`, result.value);
+            updateUserData(promiseId,result.value.data.items)
+          } else if (result.status === "rejected") {
+            console.error(`Promesa ${promiseId} rechazada:`, result.reason);
+          }
+        });
+      });
+
+      /*setUserData({
+        tracksMedium: responseTracks.data.items,
+        tracksShort: responseTracksShortTerm.data.items,
+        tracksLong: responseTracksLongTerm.data.items,
+        artistsMedium: responseArtists.data.items,
+        artistsShort: responseArtistsShortTerm.data.items,
+        artistsLong: responseArtistsLongTerm.data.items,
+      });*/
     } catch (error) {
       console.error("Error fetching the top tracks", error);
     }
