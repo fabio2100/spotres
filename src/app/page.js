@@ -7,13 +7,21 @@ import Head from "next/head";
 
 export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
-  const [token, setToken] = useState(null);
-  const [tracks, setTracks] = useState([]);
-  const [tracksLongTerm, setTracksLongTerm] = useState([]);
-  const [tracksShortTerm, setTracksShortTerm] = useState([]);
-  const [artists, setArtists] = useState([]);
-  const [artistsLongTerm, setArtistsLongTerm] = useState([]);
-  const [artistsShortTerm, setArtistsShortTerm] = useState([]);
+  const [userData,setUserData] = useState({
+    tracksMedium : [],
+    tracksShort : [],
+    tracksLong : [],
+    artistsMedium : [],
+    artistsShort : [],
+    artistsLong : [],
+  });
+
+  const updateUserData = (key,value) => {
+    setUserData((prevState)=>({
+      ...prevState,
+      [key]: value
+    }))
+  }
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -28,7 +36,6 @@ export default function HomePage() {
     try {
       const response = await axios.get(`/api/getToken?code=${code}`);
       const accessToken = response.data.access_token;
-      setToken(accessToken);
       fetchUserData(accessToken);
     } catch (error) {
       if (error.response && error.response.status === 403) {
@@ -72,12 +79,14 @@ export default function HomePage() {
         ),
       ]);
 
-      setTracks(responseTracks.data.items);
-      setTracksLongTerm(responseTracksLongTerm.data.items);
-      setTracksShortTerm(responseTracksShortTerm.data.items);
-      setArtists(responseArtists.data.items);
-      setArtistsLongTerm(responseArtistsLongTerm.data.items);
-      setArtistsShortTerm(responseArtistsShortTerm.data.items)
+      setUserData({
+        tracksMedium : responseTracks.data.items,
+        tracksShort : responseTracksShortTerm.data.items,
+        tracksLong : responseTracksLongTerm.data.items,
+        artistsMedium : responseArtists.data.items,
+        artistsShort : responseArtistsShortTerm.data.items,
+        artistsLong : responseArtistsLongTerm.data.items,
+      })
     } catch (error) {
       console.error("Error fetching the top tracks", error);
     }
@@ -95,12 +104,12 @@ export default function HomePage() {
       <div className={styles.page}>
         <h1>Spotres</h1> {}
         {hasCode ? (
-          tracks.length > 0 ? (
+          userData.tracksMedium.length > 0 ? (
             <div>
               <div className="title-section">Canciones - Últimas 4 semanas</div>
               <ol>
                 {" "}
-                {tracksShortTerm.map((track) => (
+                {userData.tracksShort.map((track) => (
                   <li key={track.id}>
                     <span>{track.name}</span>
                     <span>
@@ -113,7 +122,7 @@ export default function HomePage() {
               <div className="title-section">Canciones - Últimos 6 meses</div>
               <ol>
                 {" "}
-                {tracks.map((track) => (
+                {userData.tracksMedium.map((track) => (
                   <li key={track.id}>
                     <span>{track.name}</span>
                     <span>
@@ -127,7 +136,7 @@ export default function HomePage() {
               <div className="title-section">Canciones - Último año</div>
               <ol>
                 {" "}
-                {tracksLongTerm.map((track) => (
+                {userData.tracksLong.map((track) => (
                   <li key={track.id}>
                     <span>{track.name}</span>
                     <span>
@@ -140,7 +149,7 @@ export default function HomePage() {
               <div className="title-section">Artistas - Últimas 4 semanas</div>
               <ol>
                 {" "}
-                {artistsShortTerm.map((artist) => (
+                {userData.artistsShort.map((artist) => (
                   <li key={artist.id}>
                     {" "}
                     <span>{artist.name}</span>{" "}
@@ -151,7 +160,7 @@ export default function HomePage() {
               <div className="title-section">Artistas - Últimos 6 meses</div>
               <ol>
                 {" "}
-                {artists.map((artist) => (
+                {userData.artistsMedium.map((artist) => (
                   <li key={artist.id}>
                     {" "}
                     <span>{artist.name}</span>{" "}
@@ -162,7 +171,7 @@ export default function HomePage() {
               <div className="title-section">Artistas - Último año</div>
               <ol>
                 {" "}
-                {artistsLongTerm.map((artist) => (
+                {userData.artistsLong.map((artist) => (
                   <li key={artist.id}>
                     {" "}
                     <span>{artist.name}</span>{" "}
