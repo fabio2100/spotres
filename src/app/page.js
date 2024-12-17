@@ -15,7 +15,7 @@ export default function HomePage() {
     artistsShort: [],
     artistsLong: [],
   });
-  const [selectedList, setSelectedList] = useState();
+  const [selectedList, setSelectedList] = useState('tracksShort');
 
   const updateUserData = (key, value) => {
     setUserData((prevState) => ({
@@ -99,6 +99,13 @@ export default function HomePage() {
             { headers }
           ),
         },
+        {
+          id:"userEmail",
+          promise:  axios.get(
+            "https://api.spotify.com/v1/me",
+            { headers }
+          ),
+        }
       ];
 
       const promisesArray = promises.map((p) => p.promise);
@@ -120,7 +127,7 @@ export default function HomePage() {
   };
 
   const handleLogin = () => {
-    window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read`;
+    window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read%20user-read-email`;
   };
 
   const handleLogout = () => {
