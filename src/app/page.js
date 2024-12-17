@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 import axios from "axios";
 import Head from "next/head";
 
+
 export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
   const [userData, setUserData] = useState({
@@ -122,6 +123,10 @@ export default function HomePage() {
     window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read`;
   };
 
+  const handleLogout = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_REDIRECT_URI}`
+  }
+
   const renderList = (title, data, isTrack = true) => (
     <div>
       <div className="title-section">{title}</div>
@@ -147,7 +152,10 @@ export default function HomePage() {
         <title>Spotres</title>
       </Head>
       <div className={styles.page}>
-        <h1>Spotres</h1> {}
+        <div className="header">
+          <h1 className="title">Spotres</h1>
+          {hasCode && <p className="logout" onClick={handleLogout}>Logout</p>}
+        </div>
         {hasCode ? (
           userData.tracksMedium.length > 0 ? (
             <div>
