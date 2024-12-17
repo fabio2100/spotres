@@ -5,7 +5,6 @@ import styles from "./page.module.css";
 import axios from "axios";
 import Head from "next/head";
 
-
 export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
   const [userData, setUserData] = useState({
@@ -16,6 +15,7 @@ export default function HomePage() {
     artistsShort: [],
     artistsLong: [],
   });
+  const [selectedList, setSelectedList] = useState();
 
   const updateUserData = (key, value) => {
     setUserData((prevState) => ({
@@ -124,8 +124,44 @@ export default function HomePage() {
   };
 
   const handleLogout = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_REDIRECT_URI}`
-  }
+    window.location.href = `${process.env.NEXT_PUBLIC_REDIRECT_URI}`;
+  };
+
+  // Función para manejar los clics de los botones
+  const handleButtonClick = (list) => {
+    setSelectedList(list);
+  };
+
+  // Función para renderizar la lista según el estado
+  const renderSelectedList = () => {
+    switch (selectedList) {
+      case "tracksShort":
+        return renderList(
+          "Canciones - Últimas 4 semanas",
+          userData.tracksShort
+        );
+      case "tracksMedium":
+        return renderList("Canciones - Últimos 6 meses", userData.tracksMedium);
+      case "tracksLong":
+        return renderList("Canciones - Último año", userData.tracksLong);
+      case "artistsShort":
+        return renderList(
+          "Artistas - Últimas 4 semanas",
+          userData.artistsShort,
+          false
+        );
+      case "artistsMedium":
+        return renderList(
+          "Artistas - Últimos 6 meses",
+          userData.artistsMedium,
+          false
+        );
+      case "artistsLong":
+        return renderList("Artistas - Último año", userData.artistsLong, false);
+      default:
+        return null;
+    }
+  };
 
   const renderList = (title, data, isTrack = true) => (
     <div>
@@ -154,29 +190,38 @@ export default function HomePage() {
       <div className={styles.page}>
         <div className="header">
           <h1 className="title">Spotres</h1>
-          {hasCode && <p className="logout" onClick={handleLogout}>Logout</p>}
+          {hasCode && (
+            <p className="logout" onClick={handleLogout}>
+              Logout
+            </p>
+          )}
         </div>
         {hasCode ? (
           userData.tracksMedium.length > 0 ? (
-            <div>
-              {renderList(
-                "Canciones - Últimas 4 semanas",
-                userData.tracksShort
-              )}{" "}
-              {renderList("Canciones - Últimos 6 meses", userData.tracksMedium)}{" "}
-              {renderList("Canciones - Último año", userData.tracksLong)}{" "}
-              {renderList(
-                "Artistas - Últimas 4 semanas",
-                userData.artistsShort,
-                false
-              )}{" "}
-              {renderList(
-                "Artistas - Últimos 6 meses",
-                userData.artistsMedium,
-                false
-              )}{" "}
-              {renderList("Artistas - Último año", userData.artistsLong, false)}
-            </div>
+            <>
+              <div className="button-group">
+                {" "}
+                <button className="btn-custom" onClick={() => handleButtonClick("tracksShort")}>
+                  Canciones - Últimas 4 semanas
+                </button>{" "}
+                <button className="btn-custom" onClick={() => handleButtonClick("tracksMedium")}>
+                  Canciones - Últimos 6 meses
+                </button>{" "}
+                <button className="btn-custom" onClick={() => handleButtonClick("tracksLong")}>
+                  Canciones - Último año
+                </button>{" "}
+                <button className="btn-custom" onClick={() => handleButtonClick("artistsShort")}>
+                  Artistas - Últimas 4 semanas
+                </button>{" "}
+                <button className="btn-custom" onClick={() => handleButtonClick("artistsMedium")}>
+                  Artistas - Últimos 6 meses
+                </button>{" "}
+                <button className="btn-custom" onClick={() => handleButtonClick("artistsLong")}>
+                  Artistas - Último año
+                </button>{" "}
+              </div>
+              <div className="list-content"> {renderSelectedList()} </div>
+            </>
           ) : (
             <p>Validando código y obteniendo canciones...</p>
           )

@@ -80,7 +80,7 @@ li span {
 }
 
 li span:first-child {
-	font-size: 1.5em;
+	font-size: 1.2em;
   color: silver;
 }
 
@@ -148,5 +148,59 @@ li span:nth-child(2){
 .header .logout:hover {
   color: #09a201;
 }
+/* Estilo personalizado para los botones */
+/* Estilo personalizado para los botones */
+.btn-custom {
+  height: 50px; /* Aumentar la altura del botón */
+  cursor: pointer; /* Cambiar el cursor a la forma de mano */
+  padding: 10px 20px; /* Agregar un poco de espacio interno */
+  background-color: #0BAD02; /* Color de fondo */
+  color: white; /* Color del texto */
+  border: none; /* Sin borde */
+  border-radius: 5px; /* Bordes redondeados */
+  font-size: 16px; /* Tamaño de fuente */
+  margin: 10px; /* Separar los botones */
+  transition: background-color 0.3s; /* Suavizar la transición del color de fondo */
+}
+
+/* Efecto hover */
+.btn-custom:hover {
+  background-color: #088D02; /* Color de fondo al pasar el cursor */
+}
+
+/* Estilo para el contenedor de botones */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+/* Layout responsive */
+@media (min-width: 640px) {
+  .button-group {
+    justify-content: space-between;
+  }
+}
 
 
+@media (min-width: 1024px) {
+  .button-group {
+    flex-wrap: wrap; /* Ajustar para tres por fila */
+  }
+  .btn-custom {
+    flex: 1 1 calc(33.333% - 40px); /* Tres botones por fila */
+  }
+}
+
+@media (min-width: 1280px) {
+  .button-group {
+    flex-wrap: wrap; /* Ajustar para dos por fila */
+  }
+  .btn-custom {
+    flex: 1 1 calc(50% - 40px); /* Dos botones por fila */
+  }
+}
+
+.list-content{
+  padding-top: 20px;
+}
