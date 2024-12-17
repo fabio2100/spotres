@@ -4,5 +4,4 @@ Responsive design
 Improve html code
 button login
 songs per artists
-change promise.all
 conditional userdata.tracks.length

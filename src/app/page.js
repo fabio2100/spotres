@@ -62,14 +62,14 @@ export default function HomePage() {
           ),
         },
         {
-          id: "tracksShort",
+          id: "tracksLong",
           promise: axios.get(
             "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50",
             { headers }
           ),
         },
         {
-          id: "tracksLong",
+          id: "tracksShort",
           promise: axios.get(
             "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50",
             { headers }
@@ -100,29 +100,19 @@ export default function HomePage() {
         },
       ];
 
-      const promisesArray = promises.map(p => p.promise)
+      const promisesArray = promises.map((p) => p.promise);
 
       Promise.allSettled(promisesArray).then((results) => {
-        results.forEach((result,index) => {
-          const promiseId = promises[index].id
-          
+        results.forEach((result, index) => {
+          const promiseId = promises[index].id;
+
           if (result.status === "fulfilled") {
-            console.log(`Promesa ${promiseId} cumplida:`, result.value);
-            updateUserData(promiseId,result.value.data.items)
+            updateUserData(promiseId, result.value.data.items);
           } else if (result.status === "rejected") {
             console.error(`Promesa ${promiseId} rechazada:`, result.reason);
           }
         });
       });
-
-      /*setUserData({
-        tracksMedium: responseTracks.data.items,
-        tracksShort: responseTracksShortTerm.data.items,
-        tracksLong: responseTracksLongTerm.data.items,
-        artistsMedium: responseArtists.data.items,
-        artistsShort: responseArtistsShortTerm.data.items,
-        artistsLong: responseArtistsLongTerm.data.items,
-      });*/
     } catch (error) {
       console.error("Error fetching the top tracks", error);
     }
@@ -131,6 +121,52 @@ export default function HomePage() {
   const handleLogin = () => {
     window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read`;
   };
+
+  /*const section = (title, array, tipo) => {
+    return (
+      <>
+        <div className="title-section">{title}</div>
+        <ol>
+          {tipo === "track"
+            ? array.map((track) => {
+                <li key={track.id}>
+                  <span>{track.name}</span>
+                  <span>
+                    {track.artists.map((artist) => artist.name).join(", ")}
+                  </span>
+                  <span>{"Popularity: " + track.popularity}</span>
+                </li>;
+              })
+            : array.map((artist) => {
+                <li key={artist.id}>
+                  {" "}
+                  <span>{artist.name}</span>{" "}
+                  <span>{"Popularity: " + artist.popularity}</span>{" "}
+                </li>;
+              })}
+        </ol>
+      </>
+    );
+  };*/
+
+  const renderList = (title, data, isTrack = true) => (
+    <div>
+      <div className="title-section">{title}</div>
+      <ol>
+        {data.map((item) => (
+          <li key={item.id}>
+            <span>{item.name}</span>
+            {isTrack ? (
+              <span>
+                {item.artists.map((artist) => artist.name).join(", ")}
+              </span>
+            ) : null}
+            <span>{"Popularity: " + item.popularity}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
 
   return (
     <>
@@ -142,79 +178,23 @@ export default function HomePage() {
         {hasCode ? (
           userData.tracksMedium.length > 0 ? (
             <div>
-              <div className="title-section">Canciones - Últimas 4 semanas</div>
-              <ol>
-                {" "}
-                {userData.tracksShort.map((track) => (
-                  <li key={track.id}>
-                    <span>{track.name}</span>
-                    <span>
-                      {track.artists.map((artist) => artist.name).join(", ")}
-                    </span>
-                    <span>{"Popularity: " + track.popularity}</span>
-                  </li>
-                ))}{" "}
-              </ol>
-              <div className="title-section">Canciones - Últimos 6 meses</div>
-              <ol>
-                {" "}
-                {userData.tracksMedium.map((track) => (
-                  <li key={track.id}>
-                    <span>{track.name}</span>
-                    <span>
-                      {track.artists.map((artist) => artist.name).join(", ")}
-                    </span>
-                    <span>{"Popularity: " + track.popularity}</span>
-                  </li>
-                ))}{" "}
-              </ol>
-
-              <div className="title-section">Canciones - Último año</div>
-              <ol>
-                {" "}
-                {userData.tracksLong.map((track) => (
-                  <li key={track.id}>
-                    <span>{track.name}</span>
-                    <span>
-                      {track.artists.map((artist) => artist.name).join(", ")}
-                    </span>
-                    <span>{"Popularity: " + track.popularity}</span>
-                  </li>
-                ))}{" "}
-              </ol>
-              <div className="title-section">Artistas - Últimas 4 semanas</div>
-              <ol>
-                {" "}
-                {userData.artistsShort.map((artist) => (
-                  <li key={artist.id}>
-                    {" "}
-                    <span>{artist.name}</span>{" "}
-                    <span>{"Popularity: " + artist.popularity}</span>{" "}
-                  </li>
-                ))}{" "}
-              </ol>
-              <div className="title-section">Artistas - Últimos 6 meses</div>
-              <ol>
-                {" "}
-                {userData.artistsMedium.map((artist) => (
-                  <li key={artist.id}>
-                    {" "}
-                    <span>{artist.name}</span>{" "}
-                    <span>{"Popularity: " + artist.popularity}</span>{" "}
-                  </li>
-                ))}{" "}
-              </ol>
-              <div className="title-section">Artistas - Último año</div>
-              <ol>
-                {" "}
-                {userData.artistsLong.map((artist) => (
-                  <li key={artist.id}>
-                    {" "}
-                    <span>{artist.name}</span>{" "}
-                    <span>{"Popularity: " + artist.popularity}</span>{" "}
-                  </li>
-                ))}{" "}
-              </ol>
+              {renderList(
+                "Canciones - Últimas 4 semanas",
+                userData.tracksShort
+              )}{" "}
+              {renderList("Canciones - Últimos 6 meses", userData.tracksMedium)}{" "}
+              {renderList("Canciones - Último año", userData.tracksLong)}{" "}
+              {renderList(
+                "Artistas - Últimas 4 semanas",
+                userData.artistsShort,
+                false
+              )}{" "}
+              {renderList(
+                "Artistas - Últimos 6 meses",
+                userData.artistsMedium,
+                false
+              )}{" "}
+              {renderList("Artistas - Último año", userData.artistsLong, false)}
             </div>
           ) : (
             <p>Validando código y obteniendo canciones...</p>
