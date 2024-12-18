@@ -14,8 +14,10 @@ export default function HomePage() {
     artistsMedium: [],
     artistsShort: [],
     artistsLong: [],
+    userEmail: null,
   });
-  const [selectedList, setSelectedList] = useState('tracksShort');
+  const [selectedList, setSelectedList] = useState("tracksShort");
+  const [isUserDataUpdated, setIsUserDataUpdated] = useState(false);
 
   const updateUserData = (key, value) => {
     setUserData((prevState) => ({
@@ -56,7 +58,7 @@ export default function HomePage() {
         {
           id: "tracksMedium",
           promise: axios.get(
-            "https://api.spotify.com/v1/me/top/tracks?limit=50",
+            `https://api.spotify.com/v1/me/top/tracks?limit=${process.env.NEXT_PUBLIC_CANTIDAD_SEARCH}`,
             {
               headers,
             }
@@ -65,21 +67,21 @@ export default function HomePage() {
         {
           id: "tracksLong",
           promise: axios.get(
-            "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50",
+            `https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=${process.env.NEXT_PUBLIC_CANTIDAD_SEARCH}`,
             { headers }
           ),
         },
         {
           id: "tracksShort",
           promise: axios.get(
-            "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50",
+            `https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${process.env.NEXT_PUBLIC_CANTIDAD_SEARCH}`,
             { headers }
           ),
         },
         {
           id: "artistsMedium",
           promise: axios.get(
-            "https://api.spotify.com/v1/me/top/artists?limit=50",
+            `https://api.spotify.com/v1/me/top/artists?limit=${process.env.NEXT_PUBLIC_CANTIDAD_SEARCH}`,
             {
               headers,
             }
@@ -88,24 +90,21 @@ export default function HomePage() {
         {
           id: "artistsLong",
           promise: axios.get(
-            "https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50",
+            `https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=${process.env.NEXT_PUBLIC_CANTIDAD_SEARCH}`,
             { headers }
           ),
         },
         {
           id: "artistsShort",
           promise: axios.get(
-            "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50",
+            `https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=${process.env.NEXT_PUBLIC_CANTIDAD_SEARCH}`,
             { headers }
           ),
         },
         {
-          id:"userEmail",
-          promise:  axios.get(
-            "https://api.spotify.com/v1/me",
-            { headers }
-          ),
-        }
+          id: "userEmail",
+          promise: axios.get("https://api.spotify.com/v1/me", { headers }),
+        },
       ];
 
       const promisesArray = promises.map((p) => p.promise);
@@ -115,16 +114,36 @@ export default function HomePage() {
           const promiseId = promises[index].id;
 
           if (result.status === "fulfilled") {
-            updateUserData(promiseId, result.value.data.items);
+            updateUserData(
+              promiseId,
+              promiseId === "userEmail"
+                ? result.value.data.email
+                : result.value.data.items
+            );
           } else if (result.status === "rejected") {
             console.error(`Promesa ${promiseId} rechazada:`, result.reason);
           }
         });
+        setIsUserDataUpdated(true);
       });
     } catch (error) {
       console.error("Error fetching the top tracks", error);
     }
   };
+
+  useEffect(() => {
+    if (isUserDataUpdated) {
+      const { userEmail, ...restUserData } = userData;
+      const filteredUserData = Object.keys(restUserData).reduce((acc, key) => {
+        acc[key] = restUserData[key].map((item) => item.id);
+        return acc;
+      }, {});
+      axios
+        .post("/api/updateDB", { userEmail, userData: filteredUserData })
+        .then((response) => console.log(response))
+        .catch((error) => console.log(error));
+    }
+  }, [isUserDataUpdated, userData]);
 
   const handleLogin = () => {
     window.location.href = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}&scope=user-top-read%20user-read-email`;
@@ -208,22 +227,40 @@ export default function HomePage() {
             <>
               <div className="button-group">
                 {" "}
-                <button className="btn-custom" onClick={() => handleButtonClick("tracksShort")}>
+                <button
+                  className="btn-custom"
+                  onClick={() => handleButtonClick("tracksShort")}
+                >
                   Canciones - Últimas 4 semanas
                 </button>{" "}
-                <button className="btn-custom" onClick={() => handleButtonClick("tracksMedium")}>
+                <button
+                  className="btn-custom"
+                  onClick={() => handleButtonClick("tracksMedium")}
+                >
                   Canciones - Últimos 6 meses
                 </button>{" "}
-                <button className="btn-custom" onClick={() => handleButtonClick("tracksLong")}>
+                <button
+                  className="btn-custom"
+                  onClick={() => handleButtonClick("tracksLong")}
+                >
                   Canciones - Último año
                 </button>{" "}
-                <button className="btn-custom" onClick={() => handleButtonClick("artistsShort")}>
+                <button
+                  className="btn-custom"
+                  onClick={() => handleButtonClick("artistsShort")}
+                >
                   Artistas - Últimas 4 semanas
                 </button>{" "}
-                <button className="btn-custom" onClick={() => handleButtonClick("artistsMedium")}>
+                <button
+                  className="btn-custom"
+                  onClick={() => handleButtonClick("artistsMedium")}
+                >
                   Artistas - Últimos 6 meses
                 </button>{" "}
-                <button className="btn-custom" onClick={() => handleButtonClick("artistsLong")}>
+                <button
+                  className="btn-custom"
+                  onClick={() => handleButtonClick("artistsLong")}
+                >
                   Artistas - Último año
                 </button>{" "}
               </div>
