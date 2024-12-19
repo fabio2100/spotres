@@ -5,3 +5,5 @@ songs per artists
 conditional userdata.tracks.length
 Ranking
 Router
+positionchanges, maybe it can be handled in other way (line 174)
+join change in original array ?

@@ -19,6 +19,7 @@ export default function HomePage() {
   const [selectedList, setSelectedList] = useState("tracksShort");
   const [isUserDataUpdated, setIsUserDataUpdated] = useState(false);
   const [userDataOld, setUserDataOld] = useState(null);
+  const [positionChanges, setPositionChanges] = useState({});
 
   const updateUserData = (key, value) => {
     setUserData((prevState) => ({
@@ -166,12 +167,12 @@ export default function HomePage() {
   useEffect(() => {
     if (userDataOld && isUserDataUpdated) {
       const { filteredUserData } = processUserData(userData);
-      const positionChanges = compareAllPositions(
+      const positionChangesA = compareAllPositions(
         userDataOld,
         filteredUserData
       );
-
-      if (hasSignificantChanges(positionChanges)) {
+      setPositionChanges(positionChangesA);
+      if (hasSignificantChanges(positionChangesA)) {
         updateDB(userData);
       }
     }
@@ -189,50 +190,55 @@ export default function HomePage() {
     setSelectedList(list);
   };
 
-  const renderList = (title, data, isTrack = true) => (
+  const renderList = (title, data, isTrack = true, positionChanges = {}) => (
     <div>
       <div className="title-section">{title}</div>
       <ol>
-        {data.map((item) => (
-          <li key={item.id}>
-            <span>{item.name}</span>
-            {isTrack ? (
-              <span>
-                {item.artists.map((artist) => artist.name).join(", ")}
+        {data.map((item) => {
+          const change = positionChanges[item.id]?.change;
+          return (
+            <li key={item.id}>
+              <span>{item.name}</span>
+              {isTrack && (
+                <span>{item.artists.map((artist) => artist.name).join(", ")}</span>
+              )}
+              <span>{"Popularity: " + item.popularity}</span>
+              <span style={{ marginLeft: '1em' }}>
+                {change !== undefined ? `Change: ${change}` : 'Change: N/A'}
               </span>
-            ) : null}
-            <span>{"Popularity: " + item.popularity}</span>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ol>
     </div>
   );
+  
 
   const renderSelectedList = () => {
     switch (selectedList) {
       case "tracksShort":
         return renderList(
           "Canciones - Últimas 4 semanas",
-          userData.tracksShort
+          userData.tracksShort,true,positionChanges.tracksShort
         );
       case "tracksMedium":
-        return renderList("Canciones - Últimos 6 meses", userData.tracksMedium);
+        return renderList("Canciones - Últimos 6 meses", userData.tracksMedium,true,positionChanges.tracksMedium);
       case "tracksLong":
-        return renderList("Canciones - Último año", userData.tracksLong);
+        return renderList("Canciones - Último año", userData.tracksLong,true,positionChanges.tracksLong);
       case "artistsShort":
         return renderList(
           "Artistas - Últimas 4 semanas",
           userData.artistsShort,
-          false
+          false,positionChanges.artistsShort
         );
       case "artistsMedium":
         return renderList(
           "Artistas - Últimos 6 meses",
           userData.artistsMedium,
-          false
+          false,positionChanges.artistsMedium
         );
       case "artistsLong":
-        return renderList("Artistas - Último año", userData.artistsLong, false);
+        return renderList("Artistas - Último año", userData.artistsLong, false,positionChanges.artistsLong);
       default:
         return null;
     }
@@ -285,7 +291,7 @@ export default function HomePage() {
               <div className="list-content">{renderSelectedList()}</div>
             </>
           ) : (
-            <p>Validando código y obteniendo canciones...</p>
+            <p>Cargando...</p>
           )
         ) : (
           <button onClick={handleLogin} className="custom-button">
