@@ -190,12 +190,15 @@ export default function HomePage() {
     setSelectedList(list);
   };
 
-  const renderList = (title, data, isTrack = true, positionChanges = {}) => (
+  const renderList = (title, data, isTrack = true, positionChanges = {}) => 
+    {
+      return (
     <div>
       <div className="title-section">{title}</div>
       <ol>
-        {data.map((item) => {
-          const change = positionChanges[item.id]?.change;
+        { positionChanges.length > 0 && data.map((item) => {
+          const found = positionChanges.find((element) => element.id === item.id);
+          const change = found.change;
           return (
             <li key={item.id}>
               <span>{item.name}</span>
@@ -211,7 +214,7 @@ export default function HomePage() {
         })}
       </ol>
     </div>
-  );
+  )};
   
 
   const renderSelectedList = () => {
