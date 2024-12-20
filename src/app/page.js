@@ -20,6 +20,7 @@ export default function HomePage() {
   const [isUserDataUpdated, setIsUserDataUpdated] = useState(false);
   const [userDataOld, setUserDataOld] = useState(null);
   const [positionChanges, setPositionChanges] = useState({});
+  const [mustUpdateDB, setMustUpdateDB] = useState(false);
 
   const updateUserData = (key, value) => {
     setUserData((prevState) => ({
@@ -131,11 +132,7 @@ export default function HomePage() {
     }, {});
   };
 
-  const hasSignificantChanges = (comparisonResults) => {
-    return Object.values(comparisonResults)
-      .flatMap((arr) => arr)
-      .some((item) => item.change !== 0);
-  };
+
 
   const updateDB = async (userData) => {
     const { userEmail, filteredUserData } = processUserData(userData);
@@ -157,6 +154,7 @@ export default function HomePage() {
         .get(`/api/getUserTracks?email=${userEmail}`)
         .then((response) => {
           setUserDataOld(response.data.userData);
+          setMustUpdateDB(response.data.actualizar);
         })
         .catch(() => {
           updateDB(userData);
@@ -171,8 +169,7 @@ export default function HomePage() {
         userDataOld,
         filteredUserData
       );
-      setPositionChanges(positionChangesA);
-      if (hasSignificantChanges(positionChangesA)) {
+      setPositionChanges(positionChangesA);      if (mustUpdateDB) {
         updateDB(userData);
       }
     }

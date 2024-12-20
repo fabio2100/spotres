@@ -8,4 +8,4 @@ Router
 positionchanges, maybe it can be handled in other way (line 174)
 join change in original array ?
 se fueron=> usando id y buscando el elemento para mostrarlo
-warning cuando se actualiza la bbdd
+save token in db
