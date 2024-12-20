@@ -159,6 +159,12 @@ a {
 .list-item{
   color: white;
 }
+
+.list-item:hover{
+  background-color: #4e4e4e;
+  border-radius: 16px;
+}
+
 .avatar-modified{
   background-color: #0BAD02 !important;
 }

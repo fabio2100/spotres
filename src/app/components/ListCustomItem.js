@@ -13,8 +13,8 @@ import { FaEquals } from "react-icons/fa";
 import { styled } from '@mui/material/styles';
 
 
-const StyledSecondaryText = styled('span')({ color: 'grey', // Cambia el color según tus necesidades 
-fontStyle: 'italic', // Aplica cursiva 
+const StyledSecondaryText = styled('span')({ color: 'grey', 
+fontStyle: 'italic', 
 });
 
 export default function ListCustomItem({
@@ -33,7 +33,7 @@ export default function ListCustomItem({
     iconToShow = <FaEquals />
   }
   return (
-    <ListItem
+    <ListItem className="list-item"
       secondaryAction={
         <IconButton edge="end" aria-label="delete" className="change-icon">
           {iconToShow} 
