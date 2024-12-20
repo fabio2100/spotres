@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import axios from "axios";
 import Head from "next/head";
+import { TbCircleArrowUpFilled, TbCircleArrowDownFilled } from "react-icons/tb";
+import { FaEquals, FaPlusCircle } from "react-icons/fa";
+import ListCustomItem from "./components/ListCustomItem";
+import List from "@mui/material/List";
 
 export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
@@ -117,7 +121,7 @@ export default function HomePage() {
   const comparePositions = (oldArray, newArray) => {
     return newArray.map((id) => {
       const oldIndex = oldArray.indexOf(id);
-      if (oldIndex === -1) return { id, change: false };
+      if (oldIndex === -1) return { id, change: "Nuevo" };
       const newIndex = newArray.indexOf(id);
       return { id, change: oldIndex - newIndex };
     });
@@ -131,8 +135,6 @@ export default function HomePage() {
       return acc;
     }, {});
   };
-
-
 
   const updateDB = async (userData) => {
     const { userEmail, filteredUserData } = processUserData(userData);
@@ -169,7 +171,8 @@ export default function HomePage() {
         userDataOld,
         filteredUserData
       );
-      setPositionChanges(positionChangesA);      if (mustUpdateDB) {
+      setPositionChanges(positionChangesA);
+      if (mustUpdateDB) {
         updateDB(userData);
       }
     }
@@ -187,58 +190,81 @@ export default function HomePage() {
     setSelectedList(list);
   };
 
-  const renderList = (title, data, isTrack = true, positionChanges = {}) => 
-    {
-      return (
-    <div>
-      <div className="title-section">{title}</div>
-      <ol>
-        { positionChanges.length > 0 && data.map((item) => {
-          const found = positionChanges.find((element) => element.id === item.id);
-          const change = found.change;
-          return (
-            <li key={item.id}>
-              <span>{item.name}</span>
-              {isTrack && (
-                <span>{item.artists.map((artist) => artist.name).join(", ")}</span>
-              )}
-              <span>{"Popularity: " + item.popularity}</span>
-              <span style={{ marginLeft: '1em' }}>
-                {change !== undefined ? `Change: ${change}` : 'Change: N/A'}
-              </span>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
-  )};
-  
+  const renderList = (title, data, isTrack = true, positionChanges = {}) => {
+    return (
+      <>
+        <div className="title-section">{title}</div>
+        <List dense={true}>
+          {positionChanges.length > 0 &&
+            data.map((item,index) => {
+              const found = positionChanges.find(
+                (element) => element.id === item.id
+              );
+              const change = found.change;
+              return (
+                <ListCustomItem
+                  key={item.id}
+                  title={item.name}
+                  content={
+                    isTrack
+                      ? item.artists.map((artist) => artist.name).join(", ")
+                      : ""
+                  }
+                  image={item.image}
+                  change={change}
+                  index={index}
+                />
+              );
+            })}
+        </List>
+      </>
+    );
+  };
 
   const renderSelectedList = () => {
     switch (selectedList) {
       case "tracksShort":
         return renderList(
           "Canciones - Últimas 4 semanas",
-          userData.tracksShort,true,positionChanges.tracksShort
+          userData.tracksShort,
+          true,
+          positionChanges.tracksShort
         );
       case "tracksMedium":
-        return renderList("Canciones - Últimos 6 meses", userData.tracksMedium,true,positionChanges.tracksMedium);
+        return renderList(
+          "Canciones - Últimos 6 meses",
+          userData.tracksMedium,
+          true,
+          positionChanges.tracksMedium
+        );
       case "tracksLong":
-        return renderList("Canciones - Último año", userData.tracksLong,true,positionChanges.tracksLong);
+        return renderList(
+          "Canciones - Último año",
+          userData.tracksLong,
+          true,
+          positionChanges.tracksLong
+        );
       case "artistsShort":
         return renderList(
           "Artistas - Últimas 4 semanas",
           userData.artistsShort,
-          false,positionChanges.artistsShort
+          false,
+          positionChanges.artistsShort
         );
       case "artistsMedium":
         return renderList(
           "Artistas - Últimos 6 meses",
           userData.artistsMedium,
-          false,positionChanges.artistsMedium
+          false,
+          positionChanges.artistsMedium
         );
       case "artistsLong":
-        return renderList("Artistas - Último año", userData.artistsLong, false,positionChanges.artistsLong);
+        return renderList(
+          "Artistas - Último año",
+          userData.artistsLong,
+          false,
+          positionChanges.artistsLong
+        );
       default:
         return null;
     }
