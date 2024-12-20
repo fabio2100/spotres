@@ -10,6 +10,12 @@ import {
 import FiberNewIcon from "@mui/icons-material/FiberNew";
 import { TbCircleArrowUpFilled, TbCircleArrowDownFilled } from "react-icons/tb";
 import { FaEquals } from "react-icons/fa";
+import { styled } from '@mui/material/styles';
+
+
+const StyledSecondaryText = styled('span')({ color: 'grey', // Cambia el color según tus necesidades 
+fontStyle: 'italic', // Aplica cursiva 
+});
 
 export default function ListCustomItem({
   title,
@@ -37,7 +43,7 @@ export default function ListCustomItem({
       <ListItemAvatar>
         <Avatar className="avatar-modified">{index + 1}</Avatar>
       </ListItemAvatar>
-      <ListItemText className="list-item" primary={title} secondary={content} />
+      <ListItemText className="list-item" primary={title} secondary={<StyledSecondaryText>{content}</StyledSecondaryText>} />
     </ListItem>
   );
 }
