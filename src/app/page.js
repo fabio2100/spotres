@@ -6,6 +6,7 @@ import axios from "axios";
 import Head from "next/head";
 import ListCustomItem from "./components/ListCustomItem";
 import List from "@mui/material/List";
+import { CircularProgress } from "@mui/material";
 
 export default function HomePage() {
   const [hasCode, setHasCode] = useState(false);
@@ -317,7 +318,7 @@ export default function HomePage() {
               <div className="list-content">{renderSelectedList()}</div>
             </>
           ) : (
-            <p>Cargando...</p>
+            <CircularProgress color="success" size="4rem"/>
           )
         ) : (
           <button onClick={handleLogin} className="custom-button">
