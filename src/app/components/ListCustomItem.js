@@ -25,7 +25,6 @@ export default function ListCustomItem({
   change,
   index,
 }) {
-  console.log(title, content, image, change, index);
   let iconToShow = <FiberNewIcon />
   if (change > 0) {
     iconToShow = <><TbCircleArrowUpFilled className="arrowUp"/>{change}</>

@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import axios from "axios";
 import Head from "next/head";
-import { TbCircleArrowUpFilled, TbCircleArrowDownFilled } from "react-icons/tb";
-import { FaEquals, FaPlusCircle } from "react-icons/fa";
 import ListCustomItem from "./components/ListCustomItem";
 import List from "@mui/material/List";
 
@@ -25,6 +23,7 @@ export default function HomePage() {
   const [userDataOld, setUserDataOld] = useState(null);
   const [positionChanges, setPositionChanges] = useState({});
   const [mustUpdateDB, setMustUpdateDB] = useState(false);
+  const [isNewUser,setIsNewUser] = useState(false);
 
   const updateUserData = (key, value) => {
     setUserData((prevState) => ({
@@ -160,6 +159,7 @@ export default function HomePage() {
         })
         .catch(() => {
           updateDB(userData);
+          setIsNewUser(true);
         });
     }
   }, [isUserDataUpdated, userData]);
@@ -195,11 +195,11 @@ export default function HomePage() {
       <>
         <div className="title-section">{title}</div>
         <List dense={true}>
-          {positionChanges.length > 0 &&
+          {(positionChanges.length > 0 || isNewUser) &&
             data.map((item,index) => {
-              const found = positionChanges.find(
+              const found = positionChanges.length > 0 ? positionChanges.find(
                 (element) => element.id === item.id
-              );
+              ):false;
               const change = found.change;
               return (
                 <ListCustomItem
